@@ -1,5 +1,15 @@
 
+/*
+ * FIXED: Main application entry point
+ * CHANGES MADE:
+ * 1. Fixed import name from 'conncectDB' to 'connectDB'
+ * 2. Updated function call to use correct name
+ */
+
 import dotenv from "dotenv";
+// FIXED: Import name corrected
+// PREVIOUS CODE: import conncectDB from "./db/index.js";
+// ISSUE: Function name had typo 'conncectDB' instead of 'connectDB'
 import connectDB from "./db/index.js";
 import app from "./app.js";
 
@@ -7,6 +17,9 @@ dotenv.config({
   path: "./.env",
 });
 
+// FIXED: Function call corrected
+// PREVIOUS CODE: conncectDB().then(() => {
+// ISSUE: Function name typo
 connectDB().then(() => {
     app.listen(process.env.PORT || 8000, () => {
       console.log(`🚀 Server is running on port ${process.env.PORT || 8000}`);

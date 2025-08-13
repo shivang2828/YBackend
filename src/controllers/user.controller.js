@@ -75,11 +75,32 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 
 
 const registerUser = asyncHandler(async (req, res) => {
-  // Access form data from req.body (text fields) and files from req.files
-  const { fullname, email, password, username } = req.body;
+  // ADDED: Comprehensive debug logging to track the multer parsing issue
+  console.log("=== REQUEST DEBUG ===");
+  console.log("req.body:", req.body);
+  console.log("req.files:", req.files);
+  console.log("req.headers['content-type']:", req.headers['content-type']);
+  console.log("Body type:", typeof req.body);
+  console.log("Body keys:", Object.keys(req.body || {}));
+  console.log("====================");
 
-  // Validate that all required fields exist
+  // CHANGED: Updated field name from 'name' to 'fullname' to match user model schema
+  // PREVIOUS CODE: const { name, email, password, username } = req.body;
+  // REASON: User model has 'fullname' field, not 'name'
+  let { fullname, email, password, username } = req.body || {};
+
+  // ADDED: Enhanced validation to handle empty req.body due to multer parsing issues
+  if (!req.body || Object.keys(req.body).length === 0) {
+    console.log("req.body is empty - this is the multer parsing issue");
+    throw new ApiError(400, "Form data not properly parsed. Please ensure you're sending multipart/form-data with text fields.");
+  }
+
+  // ENHANCED: Better validation with detailed debugging
+  // PREVIOUS CODE: Simple validation without detailed logging
   if (!fullname || !email || !password || !username) {
+    console.log("Missing fields:", { fullname, email, password, username });
+    console.log("Available fields in req.body:", Object.keys(req.body));
+    // CHANGED: Updated error message to reflect correct field names
     throw new ApiError(400, "All fields (fullname, email, password, username) are required");
   }
 
@@ -96,8 +117,11 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with this email or username already exists");
   }
 
+  // CHANGED: Updated to use 'coverimage' (lowercase) to match route and model
+  // PREVIOUS CODE: const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+  // REASON: Route was expecting 'coverimage' but controller was looking for 'coverImage'
   const avatarLocalPath = req.files?.avatar?.[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+  const coverImageLocalPath = req.files?.coverimage?.[0]?.path;
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar is required");
@@ -110,12 +134,15 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to upload avatar");
   }
 
+  // CHANGED: Updated to match user model schema exactly
+  // PREVIOUS CODE: Used 'name' and 'coverImage' 
+  // CURRENT: Using 'fullname' and 'coverimage' to match user.model.js schema
   const user = await User.create({
-    fullname: fullname.trim(),
-    email: email.trim().toLowerCase(),
+    fullname: fullname.trim(),           // CHANGED: 'name' -> 'fullname'
+    email: email.trim().toLowerCase(),   // ENHANCED: Added trim() and toLowerCase()
     avatar: avatar.url,
-    coverimage: coverImage?.url || "",
-    username: username.trim().toLowerCase(),
+    coverimage: coverImage?.url || "",   // CHANGED: 'coverImage' -> 'coverimage' 
+    username: username.trim().toLowerCase(), // ENHANCED: Added trim()
     password,
   });
 

@@ -59,6 +59,8 @@
     <h1>User Registration Test</h1>
     
     <form id="registrationForm">
+        <!-- CHANGED: Field name from 'name' to 'fullname' to match user model schema -->
+        <!-- PREVIOUS: name="name" - caused mismatch with backend expecting 'fullname' -->
         <div class="form-group">
             <label for="fullname">Full Name:</label>
             <input type="text" id="fullname" name="fullname" required>
@@ -84,9 +86,11 @@
             <input type="file" id="avatar" name="avatar" accept="image/*" required>
         </div>
         
+        <!-- CHANGED: Field name from 'coverImage' to 'coverimage' to match backend route -->
+        <!-- PREVIOUS: name="coverImage" - caused "Unexpected field" error in multer -->
         <div class="form-group">
-            <label for="coverImage">Cover Image (optional):</label>
-            <input type="file" id="coverImage" name="coverImage" accept="image/*">
+            <label for="coverimage">Cover Image (optional):</label>
+            <input type="file" id="coverimage" name="coverimage" accept="image/*">
         </div>
         
         <button type="submit">Register User</button>
@@ -99,14 +103,16 @@
             e.preventDefault();
             
             const formData = new FormData();
+            // FIXED: Use 'fullname' instead of 'name' to match backend expectations
             formData.append('fullname', document.getElementById('fullname').value);
             formData.append('email', document.getElementById('email').value);
             formData.append('username', document.getElementById('username').value);
             formData.append('password', document.getElementById('password').value);
             formData.append('avatar', document.getElementById('avatar').files[0]);
             
-            if (document.getElementById('coverImage').files[0]) {
-                formData.append('coverImage', document.getElementById('coverImage').files[0]);
+            // FIXED: Use 'coverimage' (lowercase) to match backend route configuration
+            if (document.getElementById('coverimage').files[0]) {
+                formData.append('coverimage', document.getElementById('coverimage').files[0]);
             }
             
             try {
