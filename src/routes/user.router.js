@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
+import { loginUser, logoutUser, registerUser, refreshAccessToken } from "../controllers/user.controller.js";
 // CHANGED: Import new multipart parser instead of original multer middleware
 // PREVIOUS CODE: import { upload } from "../middleware/multer.middleware.js";
 // REASON: Original multer.fields() wasn't properly parsing text fields into req.body
@@ -48,6 +48,14 @@ userRouter.route("/login").post(loginUser)
 
 
 userRouter.route("/logout").post(verifyJWT, logoutUser);
+
+
+userRouter.route("/refresh-token").post(refreshAccessToken);
+
+
+
+
+
 
 
 
