@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/user.controller.js";
+import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
 // CHANGED: Import new multipart parser instead of original multer middleware
 // PREVIOUS CODE: import { upload } from "../middleware/multer.middleware.js";
 // REASON: Original multer.fields() wasn't properly parsing text fields into req.body
 import { parseMultipartForm, organizeUploadedData } from "../middleware/multipartParser.middleware.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const userRouter = Router();
 
@@ -36,6 +37,22 @@ userRouter.route("/register").post(
 );
 
 // userRouter.route("/login").post(loginUser)
+
+
+
+userRouter.route("/login").post(loginUser)
+
+
+
+//secure route to test JWT verification
+
+
+userRouter.route("/logout").post(verifyJWT, logoutUser);
+
+
+
+
+
 
 export default userRouter;
 
